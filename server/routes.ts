@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { newsCategories, type NewsCategory, insertNewsArticleSchema, type InsertNewsArticle } from "@shared/schema";
@@ -15,7 +15,7 @@ const sanitizeInput = (input: string): string => {
   return domPurify.sanitize(input, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
 };
 
-const validateRequest = (req: any, res: any, next: any) => {
+const validateRequest = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
