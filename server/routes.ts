@@ -30,7 +30,7 @@ async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]
 
   for (const query of queries) {
     try {
-      const url = `${NEWS_API_BASE_URL}/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&pageSize=20&page=${page}&apiKey=${NEWS_API_KEY}`;
+      const url = `${NEWS_API_BASE_URL}/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&pageSize=20&page=${page}&language=en&apiKey=${NEWS_API_KEY}`;
       const response = await fetch(url);
       
       if (!response.ok) {
