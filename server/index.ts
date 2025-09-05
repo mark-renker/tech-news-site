@@ -7,10 +7,8 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-// Trust proxy for rate limiting in production environments
-if (process.env.NODE_ENV === "production") {
-  app.set('trust proxy', 1);
-}
+// Trust proxy for rate limiting in production environments  
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet({

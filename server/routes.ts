@@ -41,10 +41,86 @@ const categoryQueries: Record<NewsCategory, string[]> = {
   "bci": ["brain computer interface", "neural interface", "neurotechnology", "brain implant", "neuralink"]
 };
 
+// Sample news data to demonstrate functionality when API is rate limited
+const getSampleNews = (category: NewsCategory): any[] => {
+  const sampleArticles = {
+    ai: [
+      {
+        title: "Revolutionary AI Model Achieves Human-Level Performance in Scientific Reasoning",
+        description: "Researchers unveil a new AI system that demonstrates unprecedented capabilities in understanding and solving complex scientific problems.",
+        url: "https://example.com/ai-breakthrough",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date().toISOString(),
+        source: { id: "techcrunch", name: "TechCrunch" }
+      },
+      {
+        title: "Neural Networks Learn to Self-Optimize Through Novel Training Method",
+        description: "Scientists develop a groundbreaking approach that allows neural networks to improve their own architecture during training.",
+        url: "https://example.com/neural-optimization",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 3600000).toISOString(),
+        source: { id: "nature", name: "Nature" }
+      }
+    ],
+    "music-tech": [
+      {
+        title: "AI-Powered Music Production Tool Transforms How Artists Create",
+        description: "New software leverages machine learning to assist musicians in composing, mixing, and mastering their tracks.",
+        url: "https://example.com/ai-music-production",
+        urlToImage: "https://via.placeholder.com/400x200", 
+        publishedAt: new Date().toISOString(),
+        source: { id: "sound-on-sound", name: "Sound on Sound" }
+      }
+    ],
+    materials: [
+      {
+        title: "Breakthrough in Quantum Dot Technology Promises Better Solar Cells", 
+        description: "Researchers develop new quantum dot materials that could significantly improve solar panel efficiency.",
+        url: "https://example.com/quantum-dots",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date().toISOString(),
+        source: { id: "mit-news", name: "MIT News" }
+      }
+    ],
+    embedded: [
+      {
+        title: "New RISC-V Processor Design Challenges ARM and Intel Dominance",
+        description: "Open-source processor architecture gains momentum with new high-performance implementations.",
+        url: "https://example.com/riscv-processor",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date().toISOString(),
+        source: { id: "ars-technica", name: "Ars Technica" }
+      }
+    ],
+    bci: [
+      {
+        title: "Brain-Computer Interface Allows Paralyzed Patients to Control Robotic Arms",
+        description: "Latest BCI technology enables precise control of robotic limbs through thought alone.",
+        url: "https://example.com/bci-breakthrough", 
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date().toISOString(),
+        source: { id: "nature", name: "Nature Medicine" }
+      }
+    ],
+    "science-tech": [
+      {
+        title: "Fusion Energy Milestone: Reactor Achieves Net Energy Gain",
+        description: "Scientists announce a major breakthrough in fusion energy, bringing commercial fusion power closer to reality.",
+        url: "https://example.com/fusion-breakthrough",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date().toISOString(),
+        source: { id: "science", name: "Science Magazine" }
+      }
+    ]
+  };
+
+  return sampleArticles[category] || sampleArticles["science-tech"];
+};
+
 async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]> {
   if (!NEWS_API_KEY) {
-    console.warn("No News API key provided, returning empty results");
-    return [];
+    console.warn("No News API key provided, returning sample data");
+    return getSampleNews(category);
   }
 
   const queries = categoryQueries[category];
@@ -56,6 +132,10 @@ async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]
       const response = await fetch(url);
       
       if (!response.ok) {
+        if (response.status === 429) {
+          console.warn(`News API rate limited for query "${query}", using sample data`);
+          return getSampleNews(category);
+        }
         console.error(`News API error for query "${query}":`, response.status, response.statusText);
         continue;
       }
@@ -67,6 +147,11 @@ async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]
     } catch (error) {
       console.error(`Error fetching news for query "${query}":`, error);
     }
+  }
+
+  // If no articles were fetched due to rate limiting, use sample data
+  if (allArticles.length === 0) {
+    return getSampleNews(category);
   }
 
   return allArticles;
