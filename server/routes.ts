@@ -3,6 +3,28 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { newsCategories, type NewsCategory, insertNewsArticleSchema, type InsertNewsArticle } from "@shared/schema";
 import { z } from "zod";
+import { body, query, param, validationResult } from "express-validator";
+import DOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+
+const window = new JSDOM('').window;
+const domPurify = DOMPurify(window);
+
+// Input validation helpers
+const sanitizeInput = (input: string): string => {
+  return domPurify.sanitize(input, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+};
+
+const validateRequest = (req: any, res: any, next: any) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      message: "Invalid input",
+      errors: errors.array()
+    });
+  }
+  next();
+};
 
 // News API configuration
 const NEWS_API_KEY = process.env.NEWS_API_KEY || process.env.VITE_NEWS_API_KEY || "";
@@ -67,7 +89,13 @@ function mapNewsAPIToSchema(article: any, category: NewsCategory): InsertNewsArt
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get news articles with optional category filter
-  app.get("/api/news", async (req, res) => {
+  app.get("/api/news", [
+    query('category').optional().isIn(newsCategories).withMessage('Invalid category'),
+    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+    query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be non-negative'),
+    query('refresh').optional().isBoolean().withMessage('Refresh must be boolean'),
+    validateRequest
+  ], async (req, res) => {
     try {
       const category = (req.query.category as NewsCategory) || "all";
       const limit = parseInt(req.query.limit as string) || 20;
@@ -112,26 +140,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Search articles
-  app.get("/api/news/search", async (req, res) => {
+  app.get("/api/news/search", [
+    query('q').notEmpty().trim().isLength({ min: 1, max: 200 }).withMessage('Search query must be 1-200 characters'),
+    query('category').optional().isIn(newsCategories).withMessage('Invalid category'),
+    validateRequest
+  ], async (req, res) => {
     try {
-      const query = req.query.q as string;
+      const rawQuery = req.query.q as string;
+      const sanitizedQuery = sanitizeInput(rawQuery.trim());
       const category = (req.query.category as NewsCategory) || "all";
 
-      if (!query || query.trim().length === 0) {
-        return res.status(400).json({ message: "Search query is required" });
-      }
-
-      if (!newsCategories.includes(category)) {
-        return res.status(400).json({ message: "Invalid category" });
-      }
-
-      const articles = await storage.searchArticles(query.trim(), category);
+      const articles = await storage.searchArticles(sanitizedQuery, category);
       
       res.json({
         articles,
         totalResults: articles.length,
         category,
-        query: query.trim(),
+        query: sanitizedQuery,
       });
     } catch (error) {
       console.error("Error searching news:", error);
@@ -140,7 +165,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get specific article and increment views
-  app.get("/api/news/:id", async (req, res) => {
+  app.get("/api/news/:id", [
+    param('id').isUUID().withMessage('Invalid article ID format'),
+    validateRequest
+  ], async (req, res) => {
     try {
       const { id } = req.params;
       const article = await storage.updateArticleViews(id);
