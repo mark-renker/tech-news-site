@@ -11,9 +11,9 @@ export function CategoryTabs({ activeCategory, onCategoryChange }: CategoryTabsP
 
   return (
     <div className="bg-secondary border-b border-border sticky top-16 z-40">
-      <div className="container mx-auto px-4 lg:px-6">
-        <div className="flex overflow-x-auto scrollbar-hide py-4">
-          <div className="flex space-x-2 min-w-full md:justify-center">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="overflow-x-auto scrollbar-hide py-4">
+          <div className="flex space-x-2 min-w-max md:justify-center px-2">
             {categories.map((category) => (
               <button
                 key={category}
