@@ -82,7 +82,7 @@ export class MemStorage implements IStorage {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
     
-    for (const [id, article] of this.articles) {
+    for (const [id, article] of Array.from(this.articles.entries())) {
       if (new Date(article.publishedAt) < threeDaysAgo) {
         this.articles.delete(id);
       }
