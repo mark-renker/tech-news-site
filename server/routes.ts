@@ -30,6 +30,10 @@ const validateRequest = (req: express.Request, res: express.Response, next: expr
 const NEWS_API_KEY = process.env.NEWS_API_KEY || process.env.VITE_NEWS_API_KEY || "";
 const NEWS_API_BASE_URL = "https://newsapi.org/v2";
 
+// NewsCatcher API configuration
+const NEWSCATCHER_API_KEY = process.env.NEWSCATCHER_API_KEY || "";
+const NEWSCATCHER_API_BASE_URL = "https://v3-api.newscatcherapi.com/api";
+
 // Category mappings for News API queries - more specific and targeted
 const categoryQueries: Record<NewsCategory, string[]> = {
   "all": ["technology innovation", "science breakthrough"],
@@ -39,6 +43,17 @@ const categoryQueries: Record<NewsCategory, string[]> = {
   "materials": ["materials science research", "nanotechnology breakthrough", "semiconductor development", "polymer research", "metamaterials"],
   "embedded": ["embedded system design", "FPGA development", "ASIC chip", "microcontroller programming", "IoT hardware"],
   "bci": ["brain computer interface", "neural prosthetics", "neurotechnology research", "brain implant technology", "neural signal processing"]
+};
+
+// NewsCatcher API category mappings - more optimized for NewsCatcher
+const newsCatcherQueries: Record<NewsCategory, string[]> = {
+  "all": ["technology innovation", "science breakthrough", "tech research"],
+  "ai": ["artificial intelligence", "machine learning", "deep learning", "neural networks", "AI research"],
+  "music-tech": ["music technology", "audio engineering", "music production", "digital audio", "music software"],
+  "science-tech": ["scientific research", "laboratory technology", "research innovation", "scientific computing", "research methodology"],
+  "materials": ["materials science", "nanotechnology", "semiconductor", "polymer research", "metamaterials", "materials engineering"],
+  "embedded": ["embedded systems", "FPGA", "ASIC", "microcontroller", "IoT hardware", "chip design"],
+  "bci": ["brain computer interface", "neural prosthetics", "neurotechnology", "brain implant", "neural interface"]
 };
 
 // Keywords that must be present for each category (content filtering)
@@ -367,10 +382,53 @@ const getSampleNews = (category: NewsCategory): any[] => {
   return sampleArticles[category] || sampleArticles["science-tech"];
 };
 
-async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]> {
+// Fetch news from NewsCatcher API
+async function fetchNewsFromNewsCatcher(category: NewsCategory, page = 1): Promise<any[]> {
+  if (!NEWSCATCHER_API_KEY) {
+    return [];
+  }
+
+  const queries = newsCatcherQueries[category];
+  const allArticles: any[] = [];
+
+  for (const query of queries) {
+    try {
+      const url = `${NEWSCATCHER_API_BASE_URL}/search?q=${encodeURIComponent(query)}&lang=en&page_size=20&page=${page}&sort_by=relevancy`;
+      const response = await fetch(url, {
+        headers: {
+          'x-api-token': NEWSCATCHER_API_KEY
+        }
+      });
+      
+      if (!response.ok) {
+        if (response.status === 429) {
+          console.warn(`NewsCatcher API rate limited for query "${query}"`);
+          return [];
+        }
+        console.error(`NewsCatcher API error for query "${query}":`, response.status, response.statusText);
+        continue;
+      }
+
+      const data = await response.json();
+      if (data.articles) {
+        // Filter articles to ensure they're relevant to the category
+        const relevantArticles = data.articles.filter((article: any) => 
+          isArticleRelevant(article, category)
+        );
+        allArticles.push(...relevantArticles);
+      }
+    } catch (error) {
+      console.error(`Error fetching news from NewsCatcher for query "${query}":`, error);
+    }
+  }
+
+  return allArticles;
+}
+
+// Fetch news from NewsAPI
+async function fetchNewsFromNewsAPI(category: NewsCategory, page = 1): Promise<any[]> {
   if (!NEWS_API_KEY) {
-    console.warn("No News API key provided, returning sample data");
-    return getSampleNews(category);
+    return [];
   }
 
   const queries = categoryQueries[category];
@@ -383,8 +441,8 @@ async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]
       
       if (!response.ok) {
         if (response.status === 429) {
-          console.warn(`News API rate limited for query "${query}", using sample data`);
-          return getSampleNews(category);
+          console.warn(`News API rate limited for query "${query}"`);
+          return [];
         }
         console.error(`News API error for query "${query}":`, response.status, response.statusText);
         continue;
@@ -399,28 +457,59 @@ async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]
         allArticles.push(...relevantArticles);
       }
     } catch (error) {
-      console.error(`Error fetching news for query "${query}":`, error);
+      console.error(`Error fetching news from NewsAPI for query "${query}":`, error);
     }
   }
 
-  // If no articles were fetched due to rate limiting, use sample data
-  if (allArticles.length === 0) {
-    return getSampleNews(category);
+  return allArticles;
+}
+
+async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]> {
+  let allArticles: any[] = [];
+
+  // Try NewsCatcher API first (preferred for production)
+  if (NEWSCATCHER_API_KEY) {
+    console.log(`Trying NewsCatcher API for category: ${category}`);
+    try {
+      allArticles = await fetchNewsFromNewsCatcher(category, page);
+      if (allArticles.length > 0) {
+        console.log(`✓ NewsCatcher API returned ${allArticles.length} articles for ${category}`);
+        return allArticles;
+      }
+    } catch (error) {
+      console.error("NewsCatcher API failed:", error);
+    }
   }
 
-  return allArticles;
+  // Fallback to NewsAPI if NewsCatcher fails or returns no results
+  if (NEWS_API_KEY) {
+    console.log(`Trying NewsAPI for category: ${category}`);
+    try {
+      allArticles = await fetchNewsFromNewsAPI(category, page);
+      if (allArticles.length > 0) {
+        console.log(`✓ NewsAPI returned ${allArticles.length} articles for ${category}`);
+        return allArticles;
+      }
+    } catch (error) {
+      console.error("NewsAPI failed:", error);
+    }
+  }
+
+  // Final fallback to sample data
+  console.warn(`No API keys available or all APIs failed for ${category}, using sample data`);
+  return getSampleNews(category);
 }
 
 function mapNewsAPIToSchema(article: any, category: NewsCategory): InsertNewsArticle {
   return {
     title: article.title || "Untitled",
     description: article.description || null,
-    url: article.url,
-    urlToImage: article.urlToImage || null,
-    publishedAt: article.publishedAt,
+    url: article.url || article.link, // NewsCatcher uses 'link' instead of 'url'
+    urlToImage: article.urlToImage || article.media || null, // NewsCatcher uses 'media'
+    publishedAt: article.publishedAt || article.published_date, // NewsCatcher uses 'published_date'
     source: {
       id: article.source?.id || null,
-      name: article.source?.name || "Unknown Source",
+      name: article.source?.name || article.domain_url || "Unknown Source", // NewsCatcher uses 'domain_url'
     },
     category,
   };
