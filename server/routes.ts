@@ -70,70 +70,102 @@ const getSampleNews = (category: NewsCategory): any[] => {
   const sampleArticles = {
     ai: [
       {
-        title: "Revolutionary AI Model Achieves Human-Level Performance in Scientific Reasoning",
-        description: "Researchers unveil a new AI system that demonstrates unprecedented capabilities in understanding and solving complex scientific problems.",
+        title: "New AI Algorithm Solves Complex Machine Learning Optimization Problems",
+        description: "Breakthrough artificial intelligence research shows neural networks can now solve previously intractable optimization problems in machine learning.",
         url: "https://example.com/ai-breakthrough",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
         source: { id: "techcrunch", name: "TechCrunch" }
       },
       {
-        title: "Neural Networks Learn to Self-Optimize Through Novel Training Method",
-        description: "Scientists develop a groundbreaking approach that allows neural networks to improve their own architecture during training.",
-        url: "https://example.com/neural-optimization",
+        title: "Deep Learning Model Achieves 99% Accuracy in Medical Diagnosis",
+        description: "Researchers develop advanced neural network that uses artificial intelligence to diagnose diseases with unprecedented accuracy.",
+        url: "https://example.com/ai-medical",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date(Date.now() - 3600000).toISOString(),
-        source: { id: "nature", name: "Nature" }
+        source: { id: "nature", name: "Nature AI" }
       }
     ],
     "music-tech": [
       {
-        title: "AI-Powered Music Production Tool Transforms How Artists Create",
-        description: "New software leverages machine learning to assist musicians in composing, mixing, and mastering their tracks.",
-        url: "https://example.com/ai-music-production",
+        title: "Revolutionary Audio Processing Technology Changes Music Production",
+        description: "New digital audio workstation uses advanced sound processing algorithms to transform music recording and production workflows.",
+        url: "https://example.com/audio-tech",
         urlToImage: "https://via.placeholder.com/400x200", 
         publishedAt: new Date().toISOString(),
         source: { id: "sound-on-sound", name: "Sound on Sound" }
+      },
+      {
+        title: "AI-Powered Music Software Helps Studio Engineers Perfect Recordings",
+        description: "Cutting-edge audio engineering tool uses machine learning to optimize music production and sound quality.",
+        url: "https://example.com/music-ai",
+        urlToImage: "https://via.placeholder.com/400x200", 
+        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+        source: { id: "music-tech", name: "Music Technology" }
       }
     ],
     materials: [
       {
-        title: "Breakthrough in Quantum Dot Technology Promises Better Solar Cells", 
-        description: "Researchers develop new quantum dot materials that could significantly improve solar panel efficiency.",
-        url: "https://example.com/quantum-dots",
+        title: "Scientists Develop Revolutionary Semiconductor Materials for Quantum Computing", 
+        description: "Breakthrough in materials science research creates new polymer composites and nanotechnology applications for quantum processors.",
+        url: "https://example.com/quantum-materials",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
-        source: { id: "mit-news", name: "MIT News" }
+        source: { id: "mit-news", name: "MIT Materials Research" }
+      },
+      {
+        title: "Nanotechnology Breakthrough: New Metamaterials Enable Invisible Cloaking",
+        description: "Advanced materials science creates novel composite materials using nanotechnology for revolutionary optical applications.",
+        url: "https://example.com/metamaterials",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 3600000).toISOString(),
+        source: { id: "science", name: "Materials Science Journal" }
       }
     ],
     embedded: [
       {
-        title: "New RISC-V Processor Design Challenges ARM and Intel Dominance",
-        description: "Open-source processor architecture gains momentum with new high-performance implementations.",
-        url: "https://example.com/riscv-processor",
+        title: "New FPGA Design Revolutionizes Embedded System Performance",
+        description: "Advanced embedded systems engineering breakthrough shows ASIC-like performance in reconfigurable FPGA hardware for IoT applications.",
+        url: "https://example.com/fpga-embedded",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
-        source: { id: "ars-technica", name: "Ars Technica" }
+        source: { id: "embedded", name: "Embedded Systems Engineering" }
+      },
+      {
+        title: "Microcontroller Innovation Enables Ultra-Low Power IoT Hardware",
+        description: "New embedded processor design using advanced chip architecture dramatically reduces power consumption in IoT hardware systems.",
+        url: "https://example.com/microcontroller-iot",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 5400000).toISOString(),
+        source: { id: "ars-technica", name: "Ars Technica Hardware" }
       }
     ],
     bci: [
       {
-        title: "Brain-Computer Interface Allows Paralyzed Patients to Control Robotic Arms",
-        description: "Latest BCI technology enables precise control of robotic limbs through thought alone.",
-        url: "https://example.com/bci-breakthrough", 
+        title: "Brain-Computer Interface Enables Paralyzed Patients to Control Neural Prosthetics",
+        description: "Revolutionary neurotechnology research allows brain implant users to control prosthetic devices using neural signals from brain interface systems.",
+        url: "https://example.com/bci-prosthetics", 
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
-        source: { id: "nature", name: "Nature Medicine" }
+        source: { id: "nature", name: "Nature Neurotechnology" }
+      },
+      {
+        title: "Advanced Neural Interface Technology Restores Communication for Locked-in Patients",
+        description: "Breakthrough brain-computer interface uses neural signal processing to enable communication through brain implant technology.",
+        url: "https://example.com/neural-communication",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+        source: { id: "neuroscience", name: "Journal of Neurotechnology" }
       }
     ],
     "science-tech": [
       {
-        title: "Fusion Energy Milestone: Reactor Achieves Net Energy Gain",
-        description: "Scientists announce a major breakthrough in fusion energy, bringing commercial fusion power closer to reality.",
-        url: "https://example.com/fusion-breakthrough",
+        title: "Scientific Research Breakthrough: Technology Advances Enable New Discoveries",
+        description: "Latest scientific research methodology using advanced technology leads to groundbreaking discoveries in experimental science.",
+        url: "https://example.com/science-tech-breakthrough",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
-        source: { id: "science", name: "Science Magazine" }
+        source: { id: "science", name: "Science & Technology Review" }
       }
     ]
   };
@@ -166,7 +198,11 @@ async function fetchNewsFromAPI(category: NewsCategory, page = 1): Promise<any[]
 
       const data = await response.json();
       if (data.articles) {
-        allArticles.push(...data.articles);
+        // Filter articles to ensure they're relevant to the category
+        const relevantArticles = data.articles.filter((article: any) => 
+          isArticleRelevant(article, category)
+        );
+        allArticles.push(...relevantArticles);
       }
     } catch (error) {
       console.error(`Error fetching news for query "${query}":`, error);
