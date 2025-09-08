@@ -6,7 +6,7 @@ export interface IStorage {
   getArticleById(id: string): Promise<NewsArticle | undefined>;
   createArticle(article: InsertNewsArticle): Promise<NewsArticle>;
   updateArticleViews(id: string): Promise<NewsArticle | undefined>;
-  searchArticles(query: string, category?: NewsCategory): Promise<NewsArticle[]>;
+  searchArticles(query: string, category?: NewsCategory, limit?: number, offset?: number): Promise<NewsArticle[]>;
   getTotalArticles(category?: NewsCategory): Promise<number>;
   clearOldArticles(): Promise<void>;
 }
@@ -56,7 +56,7 @@ export class MemStorage implements IStorage {
     return undefined;
   }
 
-  async searchArticles(query: string, category?: NewsCategory): Promise<NewsArticle[]> {
+  async searchArticles(query: string, category?: NewsCategory, limit = 20, offset = 0): Promise<NewsArticle[]> {
     const searchTerm = query.toLowerCase();
     let filteredArticles = Array.from(this.articles.values());
     
@@ -64,11 +64,13 @@ export class MemStorage implements IStorage {
       filteredArticles = filteredArticles.filter(article => article.category === category);
     }
     
-    return filteredArticles.filter(article =>
+    const searchResults = filteredArticles.filter(article =>
       article.title.toLowerCase().includes(searchTerm) ||
       (article.description && article.description.toLowerCase().includes(searchTerm)) ||
       article.source.name.toLowerCase().includes(searchTerm)
     ).sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    
+    return searchResults.slice(offset, offset + limit);
   }
 
   async getTotalArticles(category?: NewsCategory): Promise<number> {

@@ -288,20 +288,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/news/search", [
     query('q').notEmpty().trim().isLength({ min: 1, max: 200 }).withMessage('Search query must be 1-200 characters'),
     query('category').optional().isIn(newsCategories).withMessage('Invalid category'),
+    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+    query('offset').optional().isInt({ min: 0 }).withMessage('Offset must be non-negative'),
     validateRequest
   ], async (req, res) => {
     try {
       const rawQuery = req.query.q as string;
       const sanitizedQuery = sanitizeInput(rawQuery.trim());
       const category = (req.query.category as NewsCategory) || "all";
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
 
-      const articles = await storage.searchArticles(sanitizedQuery, category);
+      const articles = await storage.searchArticles(sanitizedQuery, category, limit, offset);
       
       res.json({
         articles,
         totalResults: articles.length,
         category,
         query: sanitizedQuery,
+        limit,
+        offset,
       });
     } catch (error) {
       console.error("Error searching news:", error);
