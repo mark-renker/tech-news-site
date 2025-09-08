@@ -39,10 +39,11 @@ export default function Home() {
 
   // Load more articles mutation
   const loadMoreMutation = useMutation({
-    mutationFn: async (offset: number) => {
-      const url = isSearchMode && searchQuery 
-        ? `/api/news/search?q=${encodeURIComponent(searchQuery)}&category=${activeCategory}&limit=20&offset=${offset}`
-        : `/api/news?category=${activeCategory}&limit=20&offset=${offset}`;
+    mutationFn: async (params: { offset: number; category: NewsCategory; searchMode: boolean; query: string }) => {
+      const { offset, category, searchMode, query } = params;
+      const url = searchMode && query 
+        ? `/api/news/search?q=${encodeURIComponent(query)}&category=${category}&limit=20&offset=${offset}`
+        : `/api/news?category=${category}&limit=20&offset=${offset}`;
       
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) {
@@ -58,9 +59,14 @@ export default function Home() {
           description: "You've reached the end of available articles.",
         });
       } else {
-        setAllArticles(prev => [...prev, ...data.articles]);
+        // Filter out duplicate articles based on ID
+        setAllArticles(prev => {
+          const existingIds = new Set(prev.map(article => article.id));
+          const newArticles = data.articles.filter(article => !existingIds.has(article.id));
+          return [...prev, ...newArticles];
+        });
         setCurrentOffset(prev => prev + 20);
-        setHasMoreArticles(data.articles.length === 20); // Assume more if we got a full page
+        setHasMoreArticles(data.articles.length === 20);
       }
     },
     onError: () => {
@@ -82,7 +88,11 @@ export default function Home() {
   // Update articles when initial data loads
   useEffect(() => {
     if (newsData?.articles) {
-      setAllArticles(newsData.articles);
+      // Remove duplicates from initial data as well
+      const uniqueArticles = newsData.articles.filter((article, index, self) => 
+        index === self.findIndex(a => a.id === article.id)
+      );
+      setAllArticles(uniqueArticles);
       setCurrentOffset(20);
       setHasMoreArticles(newsData.articles.length === 20);
     }
@@ -130,7 +140,12 @@ export default function Home() {
 
   const handleLoadMore = () => {
     if (hasMoreArticles && !loadMoreMutation.isPending) {
-      loadMoreMutation.mutate(currentOffset);
+      loadMoreMutation.mutate({
+        offset: currentOffset,
+        category: activeCategory,
+        searchMode: isSearchMode,
+        query: searchQuery
+      });
     }
   };
 
