@@ -22,7 +22,8 @@ export class MemStorage implements IStorage {
   async getArticles(category?: NewsCategory, limit = 20, offset = 0): Promise<NewsArticle[]> {
     let filteredArticles = Array.from(this.articles.values());
     
-    if (category && category !== "all") {
+    // Always filter by category - "all" category should only return articles with category="all"
+    if (category) {
       filteredArticles = filteredArticles.filter(article => article.category === category);
     }
     
@@ -70,7 +71,8 @@ export class MemStorage implements IStorage {
     const searchTerm = query.toLowerCase();
     let filteredArticles = Array.from(this.articles.values());
     
-    if (category && category !== "all") {
+    // Always filter by category when specified - including "all"
+    if (category) {
       filteredArticles = filteredArticles.filter(article => article.category === category);
     }
     
@@ -84,7 +86,7 @@ export class MemStorage implements IStorage {
   }
 
   async getTotalArticles(category?: NewsCategory): Promise<number> {
-    if (!category || category === "all") {
+    if (!category) {
       return this.articles.size;
     }
     return Array.from(this.articles.values()).filter(article => article.category === category).length;
