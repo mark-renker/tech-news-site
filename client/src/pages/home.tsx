@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { type NewsCategory, type NewsResponse } from "@shared/schema";
 import { Header } from "@/components/header";
 import { CategoryTabs } from "@/components/category-tabs";
@@ -7,22 +7,26 @@ import { NewsCard } from "@/components/news-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Circle } from "lucide-react";
+import { RefreshCw, Circle, Loader2 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<NewsCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchMode, setIsSearchMode] = useState(false);
+  const [currentOffset, setCurrentOffset] = useState(0);
+  const [allArticles, setAllArticles] = useState<any[]>([]);
+  const [hasMoreArticles, setHasMoreArticles] = useState(true);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Fetch news articles
+  // Fetch initial news articles
   const { data: newsData, isLoading, error, refetch } = useQuery<NewsResponse>({
     queryKey: ["/api/news", activeCategory, isSearchMode ? "search" : "normal", searchQuery],
     queryFn: async () => {
       const url = isSearchMode && searchQuery 
-        ? `/api/news/search?q=${encodeURIComponent(searchQuery)}&category=${activeCategory}`
-        : `/api/news?category=${activeCategory}`;
+        ? `/api/news/search?q=${encodeURIComponent(searchQuery)}&category=${activeCategory}&limit=20&offset=0`
+        : `/api/news?category=${activeCategory}&limit=20&offset=0`;
       
       const response = await fetch(url, { credentials: "include" });
       if (!response.ok) {
@@ -32,6 +36,57 @@ export default function Home() {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Load more articles mutation
+  const loadMoreMutation = useMutation({
+    mutationFn: async (offset: number) => {
+      const url = isSearchMode && searchQuery 
+        ? `/api/news/search?q=${encodeURIComponent(searchQuery)}&category=${activeCategory}&limit=20&offset=${offset}`
+        : `/api/news?category=${activeCategory}&limit=20&offset=${offset}`;
+      
+      const response = await fetch(url, { credentials: "include" });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    },
+    onSuccess: (data: NewsResponse) => {
+      if (data.articles.length === 0) {
+        setHasMoreArticles(false);
+        toast({
+          title: "No More Articles",
+          description: "You've reached the end of available articles.",
+        });
+      } else {
+        setAllArticles(prev => [...prev, ...data.articles]);
+        setCurrentOffset(prev => prev + 20);
+        setHasMoreArticles(data.articles.length === 20); // Assume more if we got a full page
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Load More Failed",
+        description: "Failed to load more articles. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Reset pagination when category or search changes
+  useEffect(() => {
+    setCurrentOffset(0);
+    setAllArticles([]);
+    setHasMoreArticles(true);
+  }, [activeCategory, isSearchMode, searchQuery]);
+
+  // Update articles when initial data loads
+  useEffect(() => {
+    if (newsData?.articles) {
+      setAllArticles(newsData.articles);
+      setCurrentOffset(20);
+      setHasMoreArticles(newsData.articles.length === 20);
+    }
+  }, [newsData]);
 
   const handleCategoryChange = (category: NewsCategory) => {
     setActiveCategory(category);
@@ -74,11 +129,9 @@ export default function Home() {
   };
 
   const handleLoadMore = () => {
-    // TODO: Implement pagination
-    toast({
-      title: "Load More",
-      description: "Pagination will be implemented in a future update.",
-    });
+    if (hasMoreArticles && !loadMoreMutation.isPending) {
+      loadMoreMutation.mutate(currentOffset);
+    }
   };
 
   const formatNumber = (num: number) => {
@@ -121,7 +174,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
             <span data-testid="text-article-count">
-              {newsData ? formatNumber(newsData.totalResults) : "0"} articles
+              {allArticles.length > 0 ? `${formatNumber(allArticles.length)} articles loaded` : "0 articles"}
             </span>
             <span>•</span>
             <span data-testid="text-last-updated">
@@ -182,10 +235,10 @@ export default function Home() {
               </div>
             ))}
           </div>
-        ) : newsData && newsData.articles.length > 0 ? (
+        ) : allArticles.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {newsData.articles.map((article) => (
+              {allArticles.map((article) => (
                 <NewsCard
                   key={article.id}
                   article={article}
@@ -195,15 +248,34 @@ export default function Home() {
             </div>
 
             {/* Load More Button */}
-            <div className="text-center mt-8">
-              <Button
-                onClick={handleLoadMore}
-                className="px-6 py-3"
-                data-testid="button-load-more"
-              >
-                Load More Articles
-              </Button>
-            </div>
+            {hasMoreArticles && (
+              <div className="text-center mt-8">
+                <Button
+                  onClick={handleLoadMore}
+                  disabled={loadMoreMutation.isPending}
+                  className="px-6 py-3"
+                  data-testid="button-load-more"
+                >
+                  {loadMoreMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Loading More...
+                    </>
+                  ) : (
+                    "Load More Articles"
+                  )}
+                </Button>
+              </div>
+            )}
+
+            {/* End of articles message */}
+            {!hasMoreArticles && allArticles.length > 20 && (
+              <div className="text-center mt-8">
+                <p className="text-muted-foreground">
+                  You've reached the end of available articles for this category.
+                </p>
+              </div>
+            )}
           </>
         ) : (
           <div className="text-center py-12">
