@@ -68,11 +68,53 @@ const isArticleRelevant = (article: any, category: NewsCategory): boolean => {
 // Sample news data to demonstrate functionality when API is rate limited
 const getSampleNews = (category: NewsCategory): any[] => {
   const sampleArticles = {
+    all: [
+      {
+        title: "Breakthrough Technology Revolutionizes Scientific Research Methods",
+        description: "Scientists develop innovative research techniques that accelerate discovery in multiple fields using advanced technology platforms.",
+        url: "https://techcrunch.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date().toISOString(),
+        source: { id: "techcrunch", name: "TechCrunch" }
+      },
+      {
+        title: "Innovation in Science Computing Transforms Data Analysis",
+        description: "New computational research tools enable faster processing of complex scientific datasets across multiple research domains.",
+        url: "https://www.nature.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 3600000).toISOString(),
+        source: { id: "nature", name: "Nature" }
+      },
+      {
+        title: "Advanced Technology Platforms Enable Collaborative Research Networks",
+        description: "Cutting-edge science and technology infrastructure connects researchers globally for breakthrough innovation projects.",
+        url: "https://www.sciencedaily.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+        source: { id: "science-daily", name: "Science Daily" }
+      },
+      {
+        title: "Research Innovation Accelerates Scientific Discovery Timeline",
+        description: "New technology-driven research methodologies reduce time from hypothesis to breakthrough in scientific studies.",
+        url: "https://www.wired.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+        source: { id: "wired", name: "Wired" }
+      },
+      {
+        title: "Technology Integration Transforms Modern Science Laboratories",
+        description: "Advanced research technology creates more efficient and collaborative scientific work environments worldwide.",
+        url: "https://www.reuters.com/technology/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 14400000).toISOString(),
+        source: { id: "reuters", name: "Reuters Technology" }
+      }
+    ],
     ai: [
       {
         title: "New AI Algorithm Solves Complex Machine Learning Optimization Problems",
         description: "Breakthrough artificial intelligence research shows neural networks can now solve previously intractable optimization problems in machine learning.",
-        url: "https://example.com/ai-breakthrough",
+        url: "https://techcrunch.com/artificial-intelligence/",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
         source: { id: "techcrunch", name: "TechCrunch" }
@@ -80,17 +122,41 @@ const getSampleNews = (category: NewsCategory): any[] => {
       {
         title: "Deep Learning Model Achieves 99% Accuracy in Medical Diagnosis",
         description: "Researchers develop advanced neural network that uses artificial intelligence to diagnose diseases with unprecedented accuracy.",
-        url: "https://example.com/ai-medical",
+        url: "https://www.nature.com/subjects/machine-learning",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date(Date.now() - 3600000).toISOString(),
         source: { id: "nature", name: "Nature AI" }
+      },
+      {
+        title: "Revolutionary Neural Network Architecture Transforms AI Performance",
+        description: "Scientists create breakthrough artificial intelligence system that uses advanced machine learning to achieve human-level reasoning.",
+        url: "https://www.wired.com/tag/artificial-intelligence/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+        source: { id: "wired", name: "Wired AI" }
+      },
+      {
+        title: "Machine Learning Algorithm Breakthrough Enables Real-Time Intelligence",
+        description: "Advanced AI model processes complex neural networks faster than ever, opening new possibilities for intelligent systems.",
+        url: "https://www.reuters.com/technology/artificial-intelligence/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+        source: { id: "reuters", name: "Reuters AI" }
+      },
+      {
+        title: "Artificial Intelligence Breakthrough: Neural Networks Learn Like Human Brain",
+        description: "Revolutionary machine learning research creates AI that mimics human intelligence using advanced neural processing algorithms.",
+        url: "https://spectrum.ieee.org/artificial-intelligence",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 14400000).toISOString(),
+        source: { id: "ieee", name: "IEEE Spectrum" }
       }
     ],
     "music-tech": [
       {
         title: "Revolutionary Audio Processing Technology Changes Music Production",
         description: "New digital audio workstation uses advanced sound processing algorithms to transform music recording and production workflows.",
-        url: "https://example.com/audio-tech",
+        url: "https://www.soundonsound.com/",
         urlToImage: "https://via.placeholder.com/400x200", 
         publishedAt: new Date().toISOString(),
         source: { id: "sound-on-sound", name: "Sound on Sound" }
@@ -98,17 +164,41 @@ const getSampleNews = (category: NewsCategory): any[] => {
       {
         title: "AI-Powered Music Software Helps Studio Engineers Perfect Recordings",
         description: "Cutting-edge audio engineering tool uses machine learning to optimize music production and sound quality.",
-        url: "https://example.com/music-ai",
+        url: "https://www.musictech.net/",
         urlToImage: "https://via.placeholder.com/400x200", 
         publishedAt: new Date(Date.now() - 7200000).toISOString(),
         source: { id: "music-tech", name: "Music Technology" }
+      },
+      {
+        title: "Digital Audio Revolution: New Studio Technology Transforms Sound Recording",
+        description: "Advanced music production software uses innovative audio processing to create professional recording capabilities for home studios.",
+        url: "https://www.gearnews.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+        source: { id: "gearnews", name: "Gearnews" }
+      },
+      {
+        title: "Music Production Breakthrough: Smart Audio Engineering Tools Launch",
+        description: "Revolutionary music technology platform combines AI with traditional audio engineering for next-generation sound production.",
+        url: "https://www.prosoundnetwork.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 14400000).toISOString(),
+        source: { id: "prosound", name: "Pro Sound Network" }
+      },
+      {
+        title: "Audio Innovation: Advanced Music Technology Enables Creative Expression",
+        description: "New music production tools give artists unprecedented control over sound design using cutting-edge audio processing technology.",
+        url: "https://www.musicradar.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 18000000).toISOString(),
+        source: { id: "musicradar", name: "MusicRadar" }
       }
     ],
     materials: [
       {
         title: "Scientists Develop Revolutionary Semiconductor Materials for Quantum Computing", 
         description: "Breakthrough in materials science research creates new polymer composites and nanotechnology applications for quantum processors.",
-        url: "https://example.com/quantum-materials",
+        url: "https://news.mit.edu/topic/materials",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
         source: { id: "mit-news", name: "MIT Materials Research" }
@@ -116,17 +206,41 @@ const getSampleNews = (category: NewsCategory): any[] => {
       {
         title: "Nanotechnology Breakthrough: New Metamaterials Enable Invisible Cloaking",
         description: "Advanced materials science creates novel composite materials using nanotechnology for revolutionary optical applications.",
-        url: "https://example.com/metamaterials",
+        url: "https://www.science.org/topic/materials-science",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date(Date.now() - 3600000).toISOString(),
         source: { id: "science", name: "Materials Science Journal" }
+      },
+      {
+        title: "Advanced Polymer Research Creates Next-Generation Materials",
+        description: "Scientists engineer revolutionary polymer composites with unprecedented properties for aerospace and semiconductor applications.",
+        url: "https://www.nature.com/subjects/materials-science",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+        source: { id: "nature", name: "Nature Materials" }
+      },
+      {
+        title: "Semiconductor Innovation: Crystal Engineering Enables Faster Computing",
+        description: "Materials science breakthrough creates new semiconductor crystal structures for ultra-high-speed processing applications.",
+        url: "https://spectrum.ieee.org/semiconductors",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+        source: { id: "ieee", name: "IEEE Spectrum Materials" }
+      },
+      {
+        title: "Nanotechnology Advances Enable Smart Materials Development",
+        description: "Revolutionary nanotechnology research creates intelligent materials that respond to environmental changes automatically.",
+        url: "https://www.nanowerk.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 14400000).toISOString(),
+        source: { id: "nanowerk", name: "Nanowerk" }
       }
     ],
     embedded: [
       {
         title: "New FPGA Design Revolutionizes Embedded System Performance",
         description: "Advanced embedded systems engineering breakthrough shows ASIC-like performance in reconfigurable FPGA hardware for IoT applications.",
-        url: "https://example.com/fpga-embedded",
+        url: "https://www.embedded.com/",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
         source: { id: "embedded", name: "Embedded Systems Engineering" }
@@ -134,17 +248,41 @@ const getSampleNews = (category: NewsCategory): any[] => {
       {
         title: "Microcontroller Innovation Enables Ultra-Low Power IoT Hardware",
         description: "New embedded processor design using advanced chip architecture dramatically reduces power consumption in IoT hardware systems.",
-        url: "https://example.com/microcontroller-iot",
+        url: "https://arstechnica.com/gadgets/",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date(Date.now() - 5400000).toISOString(),
         source: { id: "ars-technica", name: "Ars Technica Hardware" }
+      },
+      {
+        title: "ASIC Development Breakthrough Accelerates Chip Design Innovation",
+        description: "Revolutionary embedded hardware engineering creates custom ASIC designs for next-generation IoT processor applications.",
+        url: "https://spectrum.ieee.org/semiconductors",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+        source: { id: "ieee", name: "IEEE Embedded Systems" }
+      },
+      {
+        title: "IoT Hardware Revolution: Smart Processors Enable Connected Devices",
+        description: "Advanced embedded microcontroller technology creates intelligent hardware platforms for Internet of Things applications.",
+        url: "https://www.eejournal.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 14400000).toISOString(),
+        source: { id: "eejournal", name: "EE Journal" }
+      },
+      {
+        title: "Embedded Systems Engineering: FPGA Technology Transforms Computing",
+        description: "Cutting-edge FPGA development enables programmable hardware solutions for complex embedded processing tasks.",
+        url: "https://www.electronicdesign.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 18000000).toISOString(),
+        source: { id: "electronic-design", name: "Electronic Design" }
       }
     ],
     bci: [
       {
         title: "Brain-Computer Interface Enables Paralyzed Patients to Control Neural Prosthetics",
         description: "Revolutionary neurotechnology research allows brain implant users to control prosthetic devices using neural signals from brain interface systems.",
-        url: "https://example.com/bci-prosthetics", 
+        url: "https://www.nature.com/subjects/neuroscience", 
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
         source: { id: "nature", name: "Nature Neurotechnology" }
@@ -152,20 +290,76 @@ const getSampleNews = (category: NewsCategory): any[] => {
       {
         title: "Advanced Neural Interface Technology Restores Communication for Locked-in Patients",
         description: "Breakthrough brain-computer interface uses neural signal processing to enable communication through brain implant technology.",
-        url: "https://example.com/neural-communication",
+        url: "https://spectrum.ieee.org/biomedical",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date(Date.now() - 7200000).toISOString(),
         source: { id: "neuroscience", name: "Journal of Neurotechnology" }
+      },
+      {
+        title: "Neural Prosthetics Breakthrough: Brain Implants Enable Direct Device Control",
+        description: "Scientists develop advanced brain-computer interface that allows paralyzed patients to control external devices using only neural signals.",
+        url: "https://www.sciencedaily.com/news/mind_brain/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+        source: { id: "science-daily", name: "Science Daily Neuroscience" }
+      },
+      {
+        title: "Neurotechnology Innovation: Brain Interface Restores Lost Motor Functions",
+        description: "Revolutionary brain-computer interface research enables paralyzed individuals to regain motor control through neural prosthetic technology.",
+        url: "https://news.mit.edu/topic/brain-cognitive-sciences",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 14400000).toISOString(),
+        source: { id: "mit-news", name: "MIT Neurotechnology" }
+      },
+      {
+        title: "Brain Implant Technology Advances Enable Thought-Controlled Computing",
+        description: "Cutting-edge neurotechnology allows users to control computers and devices directly through brain signals via neural interface implants.",
+        url: "https://www.technologyreview.com/topic/biotechnology/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 18000000).toISOString(),
+        source: { id: "mit-tech-review", name: "MIT Technology Review" }
       }
     ],
     "science-tech": [
       {
         title: "Scientific Research Breakthrough: Technology Advances Enable New Discoveries",
         description: "Latest scientific research methodology using advanced technology leads to groundbreaking discoveries in experimental science.",
-        url: "https://example.com/science-tech-breakthrough",
+        url: "https://www.science.org/",
         urlToImage: "https://via.placeholder.com/400x200",
         publishedAt: new Date().toISOString(),
         source: { id: "science", name: "Science & Technology Review" }
+      },
+      {
+        title: "Research Technology Revolution Transforms Scientific Discovery Process",
+        description: "Advanced scientific computing and experimental technology accelerate research across multiple scientific disciplines.",
+        url: "https://www.nature.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 3600000).toISOString(),
+        source: { id: "nature", name: "Nature Science" }
+      },
+      {
+        title: "Laboratory Innovation: New Technology Platforms Enable Collaborative Research",
+        description: "Cutting-edge laboratory technology creates connected research environments for accelerated scientific discovery and study.",
+        url: "https://www.scientificamerican.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+        source: { id: "sci-american", name: "Scientific American" }
+      },
+      {
+        title: "Experimental Science Breakthrough: Digital Tools Transform Research Methods",
+        description: "Revolutionary scientific technology enables researchers to conduct more precise experiments and accelerate discovery timelines.",
+        url: "https://www.sciencedaily.com/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+        source: { id: "science-daily", name: "Science Daily" }
+      },
+      {
+        title: "Scientific Computing Advances Enable Complex Research Modeling",
+        description: "Advanced technology platforms provide scientists with powerful tools for modeling complex systems and analyzing research data.",
+        url: "https://phys.org/",
+        urlToImage: "https://via.placeholder.com/400x200",
+        publishedAt: new Date(Date.now() - 14400000).toISOString(),
+        source: { id: "phys-org", name: "Phys.org" }
       }
     ]
   };
