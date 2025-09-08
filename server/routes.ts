@@ -30,15 +30,39 @@ const validateRequest = (req: express.Request, res: express.Response, next: expr
 const NEWS_API_KEY = process.env.NEWS_API_KEY || process.env.VITE_NEWS_API_KEY || "";
 const NEWS_API_BASE_URL = "https://newsapi.org/v2";
 
-// Category mappings for News API queries
+// Category mappings for News API queries - more specific and targeted
 const categoryQueries: Record<NewsCategory, string[]> = {
-  "all": ["technology", "science"],
-  "ai": ["artificial intelligence", "machine learning", "deep learning", "AI research", "neural networks"],
-  "music-tech": ["music technology", "audio technology", "music software", "digital audio", "music production"],
-  "science-tech": ["technology", "science", "innovation", "research"],
-  "materials": ["materials science", "nanotechnology", "polymer", "semiconductor materials", "advanced materials"],
-  "embedded": ["embedded systems", "FPGA", "ASIC", "microcontroller", "chip design", "IoT hardware"],
-  "bci": ["brain computer interface", "neural interface", "neurotechnology", "brain implant", "neuralink"]
+  "all": ["technology innovation", "science breakthrough"],
+  "ai": ["artificial intelligence breakthrough", "machine learning research", "deep learning model", "AI algorithm", "neural network"],
+  "music-tech": ["music production software", "audio processing technology", "digital audio workstation", "music AI", "audio engineering"],
+  "science-tech": ["scientific research technology", "laboratory innovation", "research methodology", "scientific computing"],
+  "materials": ["materials science research", "nanotechnology breakthrough", "semiconductor development", "polymer research", "metamaterials"],
+  "embedded": ["embedded system design", "FPGA development", "ASIC chip", "microcontroller programming", "IoT hardware"],
+  "bci": ["brain computer interface", "neural prosthetics", "neurotechnology research", "brain implant technology", "neural signal processing"]
+};
+
+// Keywords that must be present for each category (content filtering)
+const categoryKeywords: Record<NewsCategory, string[]> = {
+  "all": ["technology", "science", "research", "innovation"],
+  "ai": ["artificial", "intelligence", "machine", "learning", "neural", "algorithm", "model", "AI"],
+  "music-tech": ["music", "audio", "sound", "recording", "production", "studio", "instrument", "acoustic"],
+  "science-tech": ["science", "scientific", "research", "study", "experiment", "discovery", "technology"],
+  "materials": ["material", "materials", "nanotechnology", "polymer", "semiconductor", "crystal", "composite"],
+  "embedded": ["embedded", "FPGA", "ASIC", "microcontroller", "chip", "processor", "hardware", "IoT"],
+  "bci": ["brain", "neural", "neuron", "interface", "implant", "prosthetic", "neurotechnology"]
+};
+
+// Function to check if article content matches category
+const isArticleRelevant = (article: any, category: NewsCategory): boolean => {
+  if (category === "all") return true;
+  
+  const keywords = categoryKeywords[category];
+  const title = (article.title || "").toLowerCase();
+  const description = (article.description || "").toLowerCase();
+  const content = `${title} ${description}`;
+  
+  // Article must contain at least one category-specific keyword
+  return keywords.some(keyword => content.includes(keyword.toLowerCase()));
 };
 
 // Sample news data to demonstrate functionality when API is rate limited
