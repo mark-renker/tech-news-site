@@ -9,6 +9,7 @@ export interface IStorage {
   searchArticles(query: string, category?: NewsCategory, limit?: number, offset?: number): Promise<NewsArticle[]>;
   getTotalArticles(category?: NewsCategory): Promise<number>;
   clearOldArticles(): Promise<void>;
+  removeDuplicates(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -36,6 +37,15 @@ export class MemStorage implements IStorage {
   }
 
   async createArticle(insertArticle: InsertNewsArticle): Promise<NewsArticle> {
+    // Check if article with same title and URL already exists
+    const existingArticle = Array.from(this.articles.values()).find(
+      article => article.title === insertArticle.title && article.url === insertArticle.url
+    );
+    
+    if (existingArticle) {
+      return existingArticle; // Return existing article instead of creating duplicate
+    }
+    
     const id = randomUUID();
     const article: NewsArticle = { 
       ...insertArticle, 
@@ -89,6 +99,22 @@ export class MemStorage implements IStorage {
         this.articles.delete(id);
       }
     }
+  }
+
+  async removeDuplicates(): Promise<void> {
+    const uniqueArticles = new Map<string, NewsArticle>();
+    const seenKeys = new Set<string>();
+    
+    for (const [id, article] of this.articles.entries()) {
+      const key = `${article.title}||${article.url}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        uniqueArticles.set(id, article);
+      }
+    }
+    
+    this.articles = uniqueArticles;
+    console.log(`Removed duplicates, now have ${this.articles.size} unique articles`);
   }
 }
 

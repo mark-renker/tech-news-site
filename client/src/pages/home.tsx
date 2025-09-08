@@ -253,9 +253,9 @@ export default function Home() {
         ) : allArticles.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allArticles.map((article) => (
+              {allArticles.map((article, index) => (
                 <NewsCard
-                  key={article.id}
+                  key={`${article.id}-${index}`}
                   article={article}
                   onClick={handleArticleClick}
                 />

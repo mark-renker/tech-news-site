@@ -267,6 +267,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.error("Error storing article:", error);
           }
         }
+        
+        // Clean up duplicates after adding new articles
+        await storage.removeDuplicates();
       }
 
       const articles = await storage.getArticles(category, limit, offset);
